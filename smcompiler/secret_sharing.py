@@ -8,7 +8,7 @@ from typing import List
 
 # Added imports
 import random
-import pickle
+import jsonpickle
 from expression import Secret
 
 class Share:
@@ -61,12 +61,12 @@ class Share:
 
     def serialize(self):
         """Generate a representation suitable for passing in a message."""
-        return pickle.dumps(self)
+        return jsonpickle.encode(self)
 
     @staticmethod
     def deserialize(serialized) -> Share:
         """Restore object from its serialized representation."""
-        return pickle.loads(serialized)
+        return jsonpickle.decode(serialized)
 
 # I changed the original def by adding the secObj: Secret parameter, I guess it is not a problem. 
 def share_secret(secret: int, num_shares: int, secObj: Secret) -> List[Share]:
