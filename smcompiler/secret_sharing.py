@@ -15,8 +15,8 @@ class Share:
     """
     A secret share in a finite field.
     """
-
-    prime = 999983 # some temporary value, representing prime p in the field Fp (some set F)
+            
+    prime = 987665857 # some temporary value, representing prime p in the field Fp (some set F)
 
     # Adapt constructor arguments as you wish
     def __init__(self, share_value: int, id: bytes):
@@ -52,11 +52,11 @@ class Share:
         # TODO: They mentioned scalar multiplication is based on addition, but idk if it has to be done this way, 
         #       rather than just multiplying the value (not using addition k-1 times, where k is the scalar). 
         if isinstance(other, int):
-            org_value = self.share_value
-            for _ in range(other-1):
-                    self.share_value += org_value
-            # self.share_value = (self.share_value * other) % self.prime
-        
+            # org_value = self.share_value
+            # for _ in range(other-1):
+            #         self.share_value += org_value
+            self.share_value = (self.share_value * other) % self.prime
+        # self.share_value %= self.prime
         return self
 
     def serialize(self):

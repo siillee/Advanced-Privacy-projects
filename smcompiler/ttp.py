@@ -53,7 +53,7 @@ class TrustedParamGenerator:
 
     def generate_triplet(self, op_id: str):
 
-        # Generating the secrets a, b, and c for the Beaver triplet. TODO: Check if we use the same p as in Share (Share.prime).
+        # Generating the secrets a, b, and c for the Beaver triplet.
         p = Share.prime
         a = random.randint(0, p - 1)
         b = random.randint(0, p - 1)

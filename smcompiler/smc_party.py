@@ -100,7 +100,7 @@ class SMCParty:
             b = self.process_expression(expr.b)
 
             if isinstance(a, Share) and isinstance(b, Share):
-                return a + b # We can just say "a + b" here since __add__ will be called from the Share class (in the case a and b are shares).
+                return a + b # We can just say "a + b" here since __add__ will be called from the Share class.
             
             # In case a or b is a Scalar, only one client adds the Scalar. TODO: This is checked kinda stupidly, idk if there is a smarter way for now. 
             if self.client_id != "Alice":
@@ -130,12 +130,15 @@ class SMCParty:
 
             # Case where both are of type Share. Get the beaver triplet shares, and do the computation needed.
             # Names of the variables are similar to how they named them in the docs on git. 
+            # TODO: For some reason, the results are wrong and tests fail. I suspect something is wrong in the calculation.
             if isinstance(a, Share) and isinstance(b, Share):
                 beaver_triplet_shares = self.get_beaver_triplet()
                 x_a_share = a - beaver_triplet_shares[0]
                 y_b_share = b - beaver_triplet_shares[1]
                 x_a_all_shares = []
                 y_b_all_shares = []
+                x_a_all_shares.append(x_a_share)
+                y_b_all_shares.append(y_b_share)
                 self.comm.publish_message("public_x_a_share", x_a_share.serialize())
                 self.comm.publish_message("public_y_b_share", y_b_share.serialize())
                 for client in self.protocol_spec.participant_ids:
@@ -146,9 +149,10 @@ class SMCParty:
                 x_a = reconstruct_secret(x_a_all_shares)
                 y_b = reconstruct_secret(y_b_all_shares)
 
-                z_share = beaver_triplet_shares[2] + a*y_b + b*x_a
+                z_share = beaver_triplet_shares[2] + (a*y_b) + (b*x_a)
                 if self.client_id == "Alice":
-                    z_share = z_share - x_a*y_b
+                    # TODO: This is supposed to be addition as per the slides, however project readme says subtraction for some reason, not sure why. 
+                    z_share = z_share + (x_a*y_b)
 
                 return z_share
 
