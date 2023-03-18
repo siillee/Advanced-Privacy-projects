@@ -39,15 +39,18 @@ class Expression:
         self.id = id
 
     def __add__(self, other):
-        raise NotImplementedError("You need to implement this method.")
+        # raise NotImplementedError("You need to implement this method.")
+        return AddOp(self, other)
 
 
     def __sub__(self, other):
-        raise NotImplementedError("You need to implement this method.")
+        # raise NotImplementedError("You need to implement this method.")
+        return SubOp(self, other)
 
 
     def __mul__(self, other):
-        raise NotImplementedError("You need to implement this method.")
+        # raise NotImplementedError("You need to implement this method.")
+        return MultOp(self, other)
 
 
     def __hash__(self):
@@ -56,6 +59,44 @@ class Expression:
 
     # Feel free to add as many methods as you like.
 
+class AddOp(Expression):
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __repr__(self):
+        # {self.__class__.__name__}
+        return f"({repr(self.a)} + {repr(self.b)})"
+
+    def __hash__(self):
+        return
+
+class SubOp(Expression):
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __repr__(self):
+        # {self.__class__.__name__}
+        return f"({repr(self.a)} - {repr(self.b)})"
+
+    def __hash__(self):
+        return
+
+class MultOp(Expression):
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __repr__(self):
+        # {self.__class__.__name__}
+        return f"{repr(self.a)} * {repr(self.b)}"
+
+    def __hash__(self):
+        return
 
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
@@ -85,8 +126,10 @@ class Secret(Expression):
 
     def __init__(
             self,
+            value: Optional[int] = None,
             id: Optional[bytes] = None
         ):
+        self.value = value
         super().__init__(id)
 
 

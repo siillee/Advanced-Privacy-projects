@@ -19,6 +19,9 @@ from secret_sharing import(
 
 # Feel free to add as many imports as you want.
 
+import random
+from expression import Secret
+
 
 class TrustedParamGenerator:
     """
@@ -27,7 +30,7 @@ class TrustedParamGenerator:
 
     def __init__(self):
         self.participant_ids: Set[str] = set()
-
+        self.triplet_map: Dict[str, Dict[str, Tuple[Share, Share, Share]]] = {}
 
     def add_participant(self, participant_id: str) -> None:
         """
@@ -39,6 +42,31 @@ class TrustedParamGenerator:
         """
         Retrieve a triplet of shares for a given client_id.
         """
-        raise NotImplementedError("You need to implement this method.")
+        
+        if op_id not in self.triplet_map:
+            self.generate_triplet(op_id)
+        
+        return self.triplet_map[op_id][client_id]
+
 
     # Feel free to add as many methods as you want.
+
+    def generate_triplet(self, op_id: str):
+
+        # Generating the secrets a, b, and c for the Beaver triplet. TODO: Check if we use the same p as in Share (Share.prime).
+        p = Share.prime
+        a = random.randint(0, p - 1)
+        b = random.randint(0, p - 1)
+        c = (a * b) % p
+
+        # Creating the shares of the secrets
+        sec = Secret() # TODO: Not especially needed here, it's just there because I changed the share_secret function definition. Could be dealt with better. 
+        a_shares = share_secret(a, len(self.participant_ids), sec)
+        b_shares = share_secret(b, len(self.participant_ids), sec)
+        c_shares = share_secret(c, len(self.participant_ids), sec)
+
+        # Populate the map with the shares of the triplet. Each client_id represents the share for that client. 
+        self.triplet_map[op_id] = {}
+        for i, client_id in enumerate(self.participant_ids):
+            self.triplet_map[op_id][client_id] = (a_shares[i], b_shares[i], c_shares[i])
+    
