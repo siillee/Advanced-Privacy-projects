@@ -24,5 +24,3 @@ def test_expr_construction2():
     expr = (a + b) * c - Scalar(4) - Scalar(3) + Scalar(2) * Scalar(5)
     assert repr(expr) == "((((Secret(1) + Secret(2)) * Secret(3) - Scalar(4)) - Scalar(3)) + Scalar(2) * Scalar(5))"
 
-# def test():
-#     raise NotImplementedError("You can create some tests.")

@@ -16,7 +16,7 @@ class Share:
     A secret share in a finite field.
     """
             
-    prime = 987665857 # some temporary value, representing prime p in the field Fp (some set F)
+    prime = 340282366920938463463374607431768211507  # some temporary value, representing prime p in the field (it's a 128 bit prime)
 
     # Adapt constructor arguments as you wish
     def __init__(self, share_value: int, id: bytes):
@@ -32,31 +32,21 @@ class Share:
     def __add__(self, other):
         
         if isinstance(other, Share):
-            self.share_value = (self.share_value + other.share_value) % self.prime
-            return self
+            return Share((self.share_value + other.share_value) % self.prime, self.id)
         
-        self.share_value = (self.share_value + other) % self.prime
-        return self
+        return Share((self.share_value + other) % self.prime, self.id)
 
     def __sub__(self, other):
 
         if isinstance(other, Share):
-            self.share_value = (self.share_value - other.share_value) % self.prime
-            return self
+            return Share((self.share_value - other.share_value) % self.prime, self.id)
 
-        self.share_value = (self.share_value - other) % self.prime
-        return self
+        return Share((self.share_value - other) % self.prime, self.id)
 
     def __mul__(self, other):
 
-        # TODO: They mentioned scalar multiplication is based on addition, but idk if it has to be done this way, 
-        #       rather than just multiplying the value (not using addition k-1 times, where k is the scalar). 
         if isinstance(other, int):
-            # org_value = self.share_value
-            # for _ in range(other-1):
-            #         self.share_value += org_value
-            self.share_value = (self.share_value * other) % self.prime
-        # self.share_value %= self.prime
+            return Share((self.share_value * other) % self.prime, self.id)
         return self
 
     def serialize(self):
@@ -79,7 +69,7 @@ def share_secret(secret: int, num_shares: int, secObj: Secret) -> List[Share]:
         sum += random_share_value
         secret_shares.append(Share(random_share_value, secObj.id))
 
-    secret_shares.insert(0, Share(secret - sum, secObj.id))
+    secret_shares.insert(0, Share((secret - sum) % Share.prime, secObj.id))
 
     return secret_shares
 

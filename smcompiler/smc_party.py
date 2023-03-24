@@ -11,7 +11,8 @@ from typing import (
     Dict,
     Set,
     Tuple,
-    Union
+    Union, 
+    List
 )
 
 from communication import Communication
@@ -31,6 +32,7 @@ from secret_sharing import(
 )
 
 # Feel free to add as many imports as you want.
+import jsonpickle
 
 class SMCParty:
     """
@@ -68,27 +70,28 @@ class SMCParty:
         """
 
         # Sending shares of my secret to other clients.
+        # First we compute shares for all secrets that this client has, then we send the appropriate shares to other clients. 
         num_of_shares = len(self.protocol_spec.participant_ids)
+        all_my_secrets: List[List[Share]] = []
         for secretObj, value in self.value_dict.items():
             my_secret_shares = share_secret(value, num_of_shares, secretObj)
-            for i, client in enumerate(self.protocol_spec.participant_ids):
-                self.comm.send_private_message(client, self.client_id, my_secret_shares[i].serialize())
+            all_my_secrets.append(my_secret_shares)
+
+        for i, client in enumerate(self.protocol_spec.participant_ids):
+            message_shares: List[Share] = []
+            for sec_shares in all_my_secrets:
+                message_shares.append(sec_shares[i])
+            self.comm.send_private_message(client, self.client_id, jsonpickle.encode(message_shares))
 
         # Receiving shares from other clients. 
         for client_id in self.protocol_spec.participant_ids:
-            share = Share.deserialize(self.comm.retrieve_private_message(client_id))
-            self.secret_shares_received[share.id] = share
+            shares: List[Share] = jsonpickle.decode(self.comm.retrieve_private_message(client_id))
+            for share in shares:
+                self.secret_shares_received[share.id] = share
         
-        # Processing the expression and returning the reconstructed result. 
+        # Processing the expression and returning the reconstructed result.
         res_share: Share = self.process_expression(self.protocol_spec.expr)
-        res_secret_shares = []
-        res_secret_shares.append(res_share)
-        self.comm.publish_message("public_res", res_share.serialize())
-        for client in self.protocol_spec.participant_ids:
-            if self.client_id != client:
-                res_secret_shares.append(Share.deserialize(self.comm.retrieve_public_message(client, "public_res")))
-
-        return reconstruct_secret(res_secret_shares)
+        return self.reconstruction_of_secret("public_res", res_share)
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
     def process_expression(
@@ -99,8 +102,8 @@ class SMCParty:
             a = self.process_expression(expr.a)
             b = self.process_expression(expr.b)
 
-            if isinstance(a, Share) and isinstance(b, Share):
-                return a + b # We can just say "a + b" here since __add__ will be called from the Share class.
+            if (isinstance(a, Share) and isinstance(b, Share)) or (isinstance(a, int) and isinstance(b, int)):
+                return a + b 
             
             # In case a or b is a Scalar, only one client adds the Scalar. TODO: This is checked kinda stupidly, idk if there is a smarter way for now. 
             if self.client_id != "Alice":
@@ -114,7 +117,7 @@ class SMCParty:
             a = self.process_expression(expr.a)
             b = self.process_expression(expr.b)
             
-            if isinstance(a, Share) and isinstance(b, Share):
+            if (isinstance(a, Share) and isinstance(b, Share)) or (isinstance(a, int) and isinstance(b, int)):
                 return a - b
             
             if self.client_id != "Alice":
@@ -130,29 +133,17 @@ class SMCParty:
 
             # Case where both are of type Share. Get the beaver triplet shares, and do the computation needed.
             # Names of the variables are similar to how they named them in the docs on git. 
-            # TODO: For some reason, the results are wrong and tests fail. I suspect something is wrong in the calculation.
             if isinstance(a, Share) and isinstance(b, Share):
                 beaver_triplet_shares = self.get_beaver_triplet()
                 x_a_share = a - beaver_triplet_shares[0]
                 y_b_share = b - beaver_triplet_shares[1]
-                x_a_all_shares = []
-                y_b_all_shares = []
-                x_a_all_shares.append(x_a_share)
-                y_b_all_shares.append(y_b_share)
-                self.comm.publish_message("public_x_a_share", x_a_share.serialize())
-                self.comm.publish_message("public_y_b_share", y_b_share.serialize())
-                for client in self.protocol_spec.participant_ids:
-                    if self.client_id != client:
-                        x_a_all_shares.append(Share.deserialize(self.comm.retrieve_public_message(client, "public_x_a_share")))
-                        y_b_all_shares.append(Share.deserialize(self.comm.retrieve_public_message(client, "public_y_b_share")))
 
-                x_a = reconstruct_secret(x_a_all_shares)
-                y_b = reconstruct_secret(y_b_all_shares)
+                x_a = self.reconstruction_of_secret("public_x_a_share", x_a_share)
+                y_b = self.reconstruction_of_secret("public_y_b_share", y_b_share)
 
                 z_share = beaver_triplet_shares[2] + (a*y_b) + (b*x_a)
                 if self.client_id == "Alice":
-                    # TODO: This is supposed to be addition as per the slides, however project readme says subtraction for some reason, not sure why. 
-                    z_share = z_share + (x_a*y_b)
+                    z_share = z_share - (x_a*y_b)
 
                 return z_share
 
@@ -177,3 +168,12 @@ class SMCParty:
         result = self.comm.retrieve_beaver_triplet_shares("MultOp" + str(self.multOp_counter))
         self.multOp_counter += 1
         return result
+    
+    def reconstruction_of_secret(self, label: str, myShare: Share) -> int: 
+
+        res_secret_shares = []
+        self.comm.publish_message(label, myShare.serialize())
+        for client in self.protocol_spec.participant_ids:
+            res_secret_shares.append(Share.deserialize(self.comm.retrieve_public_message(client, label)))
+
+        return reconstruct_secret(res_secret_shares)
