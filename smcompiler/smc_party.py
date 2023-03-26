@@ -122,7 +122,7 @@ class SMCParty:
             
             if self.client_id != "Alice":
                 if isinstance(a, int):
-                    return b
+                    return -b
                 return a
             
             return a - b
