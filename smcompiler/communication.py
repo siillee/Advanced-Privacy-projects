@@ -50,6 +50,10 @@ class Communication:
         self.client_id = client_id
         self.poll_delay = poll_delay
 
+        # Fields for testing performance
+        self.bytes_sent = 0
+        self.bytes_received = 0
+        self.network_delay = 0
 
     def send_private_message(
             self,
@@ -65,9 +69,13 @@ class Communication:
         receiver_id_san = sanitize_url_param(receiver_id)
         label_san = sanitize_url_param(label)
 
+        startTime = time.time()
         url = f"{self.base_url}/private/{client_id_san}/{receiver_id_san}/{label_san}"
         print(f"POST {url}")
         requests.post(url, message)
+        endTime = time.time()
+        self.network_delay += endTime - startTime
+        self.bytes_sent += len(message)
 
 
     def retrieve_private_message(
@@ -84,10 +92,14 @@ class Communication:
         url = f"{self.base_url}/private/{client_id_san}/{label_san}"
         # We can either use a websocket, or do some polling, but websockets would require asyncio.
         # So we are doing polling to avoid introducing a new programming paradigm.
+        startTime = time.time()
         while True:
             print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
+                endTime = time.time()
+                self.network_delay += endTime - startTime
+                self.bytes_received += len(res.content)
                 return res.content
             time.sleep(self.poll_delay)
 
@@ -104,9 +116,13 @@ class Communication:
         client_id_san = sanitize_url_param(self.client_id)
         label_san = sanitize_url_param(label)
 
+        startTime = time.time()
         url = f"{self.base_url}/public/{client_id_san}/{label_san}"
         print(f"POST {url}")
         requests.post(url, message)
+        endTime = time.time()
+        self.network_delay += endTime - startTime
+        self.bytes_sent += len(message)
 
 
     def retrieve_public_message(
@@ -126,10 +142,14 @@ class Communication:
 
         # We can either use a websocket, or do some polling, but websockets would require asyncio.
         # So we are doing polling to avoid introducing a new programming paradigm.
+        startTime = time.time()
         while True:
             print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
+                endTime = time.time()
+                self.network_delay += endTime - startTime
+                self.bytes_received += len(res.content)
                 return res.content
             time.sleep(self.poll_delay)
 
@@ -145,8 +165,12 @@ class Communication:
         client_id_san = sanitize_url_param(self.client_id)
         op_id_san = sanitize_url_param(op_id)
 
+        startTime = time.time()
         url = f"{self.base_url}/shares/{client_id_san}/{op_id_san}"
         print(f"GET  {url}")
 
         res = requests.get(url)
+        endTime = time.time()
+        self.network_delay += endTime - startTime
+        self.bytes_received += len(res.content)
         return tuple([Share.deserialize(s) for s in json.loads(res.text)]) # type: ignore

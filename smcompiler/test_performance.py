@@ -11,6 +11,8 @@ from smc_party import SMCParty
 
 from secret_sharing import Share
 
+import csv
+
 
 def smc_client(client_id, prot, value_dict, queue):
     cli = SMCParty(
@@ -71,7 +73,12 @@ def suite(parties, expr, expected):
 
 def test_num_of_participants():
 
-    num_of_participants = [10, 20, 50, 100, 200] # The 200 case here take around 100 seconds to finish. 
+    with open('performance_data.csv', 'a', encoding='UTF8') as f:
+        data = ["participants_test", "", "", "", ""]
+        writer = csv.writer(f)
+        writer.writerow(data)
+
+    num_of_participants = [10, 20, 50, 100] # The 200 case here take around 100 seconds to finish. 
     alice_secret = Secret()
     bob_secret = Secret()
     charlie_secret = Secret()
@@ -89,13 +96,15 @@ def test_num_of_participants():
             id = "client" + str(i)
             new_secret = Secret()
             parties[id] = {new_secret: 1}
-        
-        startTime = time.time()
+
         suite(parties, expr, expected)
-        endTime = time.time()
-        print("Participant performance test with " + str(num) + " participants finished in " + str(endTime - startTime) + " seconds.")
 
 def test_addition():
+
+    with open('performance_data.csv', 'a', encoding='UTF8') as f:
+        data = ["add_test", "", "", "", ""]
+        writer = csv.writer(f)
+        writer.writerow(data)
 
     alice_secret = Secret()
     bob_secret = Secret()
@@ -115,12 +124,14 @@ def test_addition():
         for _ in range(num-1):
             expr += alice_secret
         expected = num * 3
-        startTime = time.time()
         suite(parties, expr, expected)
-        endTime = time.time()
-        print("Addition performance test with " + str(num) + " addition operations finished in " + str(endTime - startTime) + " seconds.")
 
 def test_scalar_addition():
+
+    with open('performance_data.csv', 'a', encoding='UTF8') as f:
+        data = ["scalar_add_test", "", "", "", ""]
+        writer = csv.writer(f)
+        writer.writerow(data)
 
     alice_secret = Secret()
     bob_secret = Secret()
@@ -139,12 +150,14 @@ def test_scalar_addition():
         for _ in range(num):
             expr += Scalar(5)
         expected = 20 + num*5
-        startTime = time.time()
         suite(parties, expr, expected)
-        endTime = time.time()
-        print("Scalar addition performance test with " + str(num) + " scalar addition operations finished in " + str(endTime - startTime) + " seconds.")
 
 def test_multiplication():
+
+    with open('performance_data.csv', 'a', encoding='UTF8') as f:
+        data = ["mult_test", "", "", "", ""]
+        writer = csv.writer(f)
+        writer.writerow(data)
 
     alice_secret = Secret()
     bob_secret = Secret()
@@ -164,12 +177,14 @@ def test_multiplication():
         for _ in range(num-1):
             expr *= alice_secret
         expected = (pow(3, num)) % Share.prime
-        startTime = time.time()
         suite(parties, expr, expected)
-        endTime = time.time()
-        print("Multiplication performance test with " + str(num) + " multiplication operations finished in " + str(endTime - startTime) + " seconds.")
 
 def test_scalar_multiplication():
+
+    with open('performance_data.csv', 'a', encoding='UTF8') as f:
+        data = ["scalar_mult_test", "", "", "", ""]
+        writer = csv.writer(f)
+        writer.writerow(data)
 
     alice_secret = Secret()
     bob_secret = Secret()
@@ -188,8 +203,4 @@ def test_scalar_multiplication():
         for _ in range(num):
             expr *= Scalar(5)
         expected = (20 * pow(5, num)) % Share.prime
-        startTime = time.time()
         suite(parties, expr, expected)
-        endTime = time.time()
-        print("Scalar multiplication performance test with " + str(num) + 
-              " scalar multiplication operations finished in " + str(endTime - startTime) + " seconds.")

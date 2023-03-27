@@ -33,6 +33,8 @@ from secret_sharing import(
 
 # Feel free to add as many imports as you want.
 import jsonpickle
+import time
+import csv
 
 class SMCParty:
     """
@@ -69,6 +71,8 @@ class SMCParty:
         The method the client use to do the SMC.
         """
 
+        startTime = time.time()
+
         # Sending shares of my secret to other clients.
         # First we compute shares for all secrets that this client has, then we send the appropriate shares to other clients. 
         num_of_shares = len(self.protocol_spec.participant_ids)
@@ -91,6 +95,20 @@ class SMCParty:
         
         # Processing the expression and returning the reconstructed result.
         res_share: Share = self.process_expression(self.protocol_spec.expr)
+
+        # Writing performance measurements to file
+        endTime = time.time()
+        totalTime = endTime - startTime
+        compTime = totalTime -self.comm.network_delay
+        total_bytes_sent = self.comm.bytes_sent
+        total_bytes_received = self.comm.bytes_received
+
+        if self.client_id == "Alice":
+            data = ["", totalTime, compTime, total_bytes_sent, total_bytes_received]
+            with open('performance_data.csv', 'a', encoding='UTF8') as f:
+                writer = csv.writer(f)
+                writer.writerow(data)
+
         return self.reconstruction_of_secret("public_res", res_share)
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -122,7 +140,7 @@ class SMCParty:
             
             if self.client_id != "Alice":
                 if isinstance(a, int):
-                    return -b
+                    return b
                 return a
             
             return a - b
@@ -134,7 +152,7 @@ class SMCParty:
             # Case where both are of type Share. Get the beaver triplet shares, and do the computation needed.
             # Names of the variables are similar to how they named them in the docs on git. 
             if isinstance(a, Share) and isinstance(b, Share):
-                beaver_triplet_shares = self.get_beaver_triplet()
+                beaver_triplet_shares = self.get_beaver_triplet(expr.id)
                 x_a_share = a - beaver_triplet_shares[0]
                 y_b_share = b - beaver_triplet_shares[1]
 
@@ -163,9 +181,9 @@ class SMCParty:
 
     # Feel free to add as many methods as you want.    
     
-    def get_beaver_triplet(self):
+    def get_beaver_triplet(self, id: str):
 
-        result = self.comm.retrieve_beaver_triplet_shares("MultOp" + str(self.multOp_counter))
+        result = self.comm.retrieve_beaver_triplet_shares(id)
         self.multOp_counter += 1
         return result
     
