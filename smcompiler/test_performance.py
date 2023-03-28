@@ -73,134 +73,139 @@ def suite(parties, expr, expected):
 
 def test_num_of_participants():
 
-    with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        data = ["participants_test", "", "", "", ""]
-        writer = csv.writer(f)
-        writer.writerow(data)
+    for _ in range(10):
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+            data = ["participants_test", "", "", "", ""]
+            writer = csv.writer(f)
+            writer.writerow(data)
 
-    num_of_participants = [10, 20, 50, 100] # The 200 case here take around 100 seconds to finish. 
-    alice_secret = Secret()
-    bob_secret = Secret()
-    charlie_secret = Secret()
+        num_of_participants = [10, 20, 50, 100] # The 200 case here take around 100 seconds to finish. 
+        alice_secret = Secret()
+        bob_secret = Secret()
+        charlie_secret = Secret()
 
-    parties = {
-        "Alice": {alice_secret: 3},
-        "Bob": {bob_secret: 14},
-        "Charlie": {charlie_secret: 2}
-    }
-    expr = (alice_secret + bob_secret + charlie_secret)
-    expected = 3 + 14 + 2
+        parties = {
+            "Alice": {alice_secret: 3},
+            "Bob": {bob_secret: 14},
+            "Charlie": {charlie_secret: 2}
+        }
+        expr = (alice_secret + bob_secret + charlie_secret)
+        expected = 3 + 14 + 2
     
-    for num in num_of_participants:
-        for i in range(num-3):
-            id = "client" + str(i)
-            new_secret = Secret()
-            parties[id] = {new_secret: 1}
+        for num in num_of_participants:
+            for i in range(num-3):
+                id = "client" + str(i)
+                new_secret = Secret()
+                parties[id] = {new_secret: 1}
 
-        suite(parties, expr, expected)
+            suite(parties, expr, expected)
 
 def test_addition():
 
-    with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        data = ["add_test", "", "", "", ""]
-        writer = csv.writer(f)
-        writer.writerow(data)
+    for _ in range(10):
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+            data = ["add_test", "", "", "", ""]
+            writer = csv.writer(f)
+            writer.writerow(data)
 
-    alice_secret = Secret()
-    bob_secret = Secret()
-    charlie_secret = Secret()
+        alice_secret = Secret()
+        bob_secret = Secret()
+        charlie_secret = Secret()
 
-    parties = {
-        "Alice": {alice_secret: 3},
-        "Bob": {bob_secret: 14},
-        "Charlie": {charlie_secret: 2}
-    }
+        parties = {
+            "Alice": {alice_secret: 3},
+            "Bob": {bob_secret: 14},
+            "Charlie": {charlie_secret: 2}
+        }
 
-    # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-    num_of_additions = [10, 100, 250, 500]
+        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
+        num_of_additions = [10, 100, 250, 500]
 
-    for num in num_of_additions:
-        expr = alice_secret
-        for _ in range(num-1):
-            expr += alice_secret
-        expected = num * 3
-        suite(parties, expr, expected)
+        for num in num_of_additions:
+            expr = alice_secret
+            for _ in range(num-1):
+                expr += alice_secret
+            expected = num * 3
+            suite(parties, expr, expected)
 
 def test_scalar_addition():
 
-    with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        data = ["scalar_add_test", "", "", "", ""]
-        writer = csv.writer(f)
-        writer.writerow(data)
+    for _ in range(10):
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+            data = ["scalar_add_test", "", "", "", ""]
+            writer = csv.writer(f)
+            writer.writerow(data)
 
-    alice_secret = Secret()
-    bob_secret = Secret()
-    charlie_secret = Secret()
+        alice_secret = Secret()
+        bob_secret = Secret()
+        charlie_secret = Secret()
 
-    parties = {
-        "Alice": {alice_secret: 3},
-        "Bob": {bob_secret: 14},
-        "Charlie": {charlie_secret: 3}
-    }
-    
-    # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-    num_of_additions = [10, 100, 250, 500]
-    for num in num_of_additions:
-        expr = (alice_secret + bob_secret + charlie_secret)
-        for _ in range(num):
-            expr += Scalar(5)
-        expected = 20 + num*5
-        suite(parties, expr, expected)
+        parties = {
+            "Alice": {alice_secret: 3},
+            "Bob": {bob_secret: 14},
+            "Charlie": {charlie_secret: 3}
+        }
+        
+        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
+        num_of_additions = [10, 100, 250, 500]
+        for num in num_of_additions:
+            expr = (alice_secret + bob_secret + charlie_secret)
+            for _ in range(num):
+                expr += Scalar(5)
+            expected = 20 + num*5
+            suite(parties, expr, expected)
 
 def test_multiplication():
 
-    with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        data = ["mult_test", "", "", "", ""]
-        writer = csv.writer(f)
-        writer.writerow(data)
+    for _ in range(10):
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+            data = ["mult_test", "", "", "", ""]
+            writer = csv.writer(f)
+            writer.writerow(data)
 
-    alice_secret = Secret()
-    bob_secret = Secret()
-    charlie_secret = Secret()
+        alice_secret = Secret()
+        bob_secret = Secret()
+        charlie_secret = Secret()
 
-    parties = {
-        "Alice": {alice_secret: 3},
-        "Bob": {bob_secret: 14},
-        "Charlie": {charlie_secret: 2}
-    }
+        parties = {
+            "Alice": {alice_secret: 3},
+            "Bob": {bob_secret: 14},
+            "Charlie": {charlie_secret: 2}
+        }
 
-    # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-    num_of_additions = [10, 100, 250, 500]
+        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
+        num_of_additions = [10, 100, 250, 500]
 
-    for num in num_of_additions:
-        expr = alice_secret
-        for _ in range(num-1):
-            expr *= alice_secret
-        expected = (pow(3, num)) % Share.prime
-        suite(parties, expr, expected)
+        for num in num_of_additions:
+            expr = alice_secret
+            for _ in range(num-1):
+                expr *= alice_secret
+            expected = (pow(3, num)) % Share.prime
+            suite(parties, expr, expected)
 
 def test_scalar_multiplication():
 
-    with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        data = ["scalar_mult_test", "", "", "", ""]
-        writer = csv.writer(f)
-        writer.writerow(data)
+    for _ in range(10):
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+            data = ["scalar_mult_test", "", "", "", ""]
+            writer = csv.writer(f)
+            writer.writerow(data)
 
-    alice_secret = Secret()
-    bob_secret = Secret()
-    charlie_secret = Secret()
+        alice_secret = Secret()
+        bob_secret = Secret()
+        charlie_secret = Secret()
 
-    parties = {
-        "Alice": {alice_secret: 3},
-        "Bob": {bob_secret: 14},
-        "Charlie": {charlie_secret: 3}
-    }
-    
-    # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-    num_of_additions = [10, 100, 250, 500]
-    for num in num_of_additions:
-        expr = (alice_secret + bob_secret + charlie_secret)
-        for _ in range(num):
-            expr *= Scalar(5)
-        expected = (20 * pow(5, num)) % Share.prime
-        suite(parties, expr, expected)
+        parties = {
+            "Alice": {alice_secret: 3},
+            "Bob": {bob_secret: 14},
+            "Charlie": {charlie_secret: 3}
+        }
+        
+        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
+        num_of_additions = [10, 100, 250, 500]
+        for num in num_of_additions:
+            expr = (alice_secret + bob_secret + charlie_secret)
+            for _ in range(num):
+                expr *= Scalar(5)
+            expected = (20 * pow(5, num)) % Share.prime
+            suite(parties, expr, expected)

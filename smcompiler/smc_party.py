@@ -92,7 +92,7 @@ class SMCParty:
         total_bytes_sent = self.comm.bytes_sent
         total_bytes_received = self.comm.bytes_received
 
-        if self.client_id == "Alice":
+        if self.client_id == self.client_zero:
             data = ["", totalTime, compTime, total_bytes_sent, total_bytes_received]
             with open('performance_data.csv', 'a', encoding='UTF8') as f:
                 writer = csv.writer(f)
@@ -129,7 +129,7 @@ class SMCParty:
             
             if self.client_id != self.client_zero:
                 if isinstance(a, int):
-                    return b
+                    return -b
                 return a
             
             return a - b
