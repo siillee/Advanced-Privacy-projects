@@ -64,7 +64,8 @@ class SMCParty:
         self.value_dict = value_dict
 
         self.secret_shares_received = {}
-        self.multOp_counter = 0
+        self.client_zero = sorted(self.protocol_spec.participant_ids)[
+            0] 
 
     def run(self) -> int:
         """
@@ -76,22 +77,10 @@ class SMCParty:
         # Sending shares of my secret to other clients.
         # First we compute shares for all secrets that this client has, then we send the appropriate shares to other clients. 
         num_of_shares = len(self.protocol_spec.participant_ids)
-        all_my_secrets: List[List[Share]] = []
         for secretObj, value in self.value_dict.items():
-            my_secret_shares = share_secret(value, num_of_shares, secretObj)
-            all_my_secrets.append(my_secret_shares)
-
-        for i, client in enumerate(self.protocol_spec.participant_ids):
-            message_shares: List[Share] = []
-            for sec_shares in all_my_secrets:
-                message_shares.append(sec_shares[i])
-            self.comm.send_private_message(client, self.client_id, jsonpickle.encode(message_shares))
-
-        # Receiving shares from other clients. 
-        for client_id in self.protocol_spec.participant_ids:
-            shares: List[Share] = jsonpickle.decode(self.comm.retrieve_private_message(client_id))
-            for share in shares:
-                self.secret_shares_received[share.id] = share
+            my_secret_shares = share_secret(value, num_of_shares)
+            for i, client in enumerate(self.protocol_spec.participant_ids):
+                self.comm.send_private_message(client, secretObj.id, my_secret_shares[i].serialize())
         
         # Processing the expression and returning the reconstructed result.
         res_share: Share = self.process_expression(self.protocol_spec.expr)
@@ -115,7 +104,7 @@ class SMCParty:
     def process_expression(
             self,
             expr: Expression
-        ):
+        ) -> Share:
         if isinstance(expr, AddOp):
             a = self.process_expression(expr.a)
             b = self.process_expression(expr.b)
@@ -138,7 +127,7 @@ class SMCParty:
             if (isinstance(a, Share) and isinstance(b, Share)) or (isinstance(a, int) and isinstance(b, int)):
                 return a - b
             
-            if self.client_id != "Alice":
+            if self.client_id != self.client_zero:
                 if isinstance(a, int):
                     return b
                 return a
@@ -160,7 +149,7 @@ class SMCParty:
                 y_b = self.reconstruction_of_secret("public_y_b_share", y_b_share)
 
                 z_share = beaver_triplet_shares[2] + (a*y_b) + (b*x_a)
-                if self.client_id == "Alice":
+                if self.client_id == self.client_zero:
                     z_share = z_share - (x_a*y_b)
 
                 return z_share
@@ -169,7 +158,12 @@ class SMCParty:
              
 
         if isinstance(expr, Secret):
-            return self.secret_shares_received[expr.id] 
+            if expr.id in self.secret_shares_received:
+                return self.secret_shares_received[expr.id]
+            else:
+                self.secret_shares_received[expr.id] = Share.deserialize(
+                    self.comm.retrieve_private_message(expr.id))
+                return self.secret_shares_received[expr.id]
 
         if isinstance(expr, Scalar):
             return expr.value
@@ -182,10 +176,7 @@ class SMCParty:
     # Feel free to add as many methods as you want.    
     
     def get_beaver_triplet(self, id: str):
-
-        result = self.comm.retrieve_beaver_triplet_shares(id)
-        self.multOp_counter += 1
-        return result
+        return self.comm.retrieve_beaver_triplet_shares(id)
     
     def reconstruction_of_secret(self, label: str, myShare: Share) -> int: 
 

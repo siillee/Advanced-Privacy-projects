@@ -87,9 +87,10 @@ class SubOp(Expression):
 
 class MultOp(Expression):
 
-    def __init__(self, a, b):
+    def __init__(self, a, b, id:Optional[bytes] = None):
         self.a = a
         self.b = b
+        super().__init__(id)
 
     def __repr__(self):
         # {self.__class__.__name__}

@@ -59,11 +59,10 @@ class TrustedParamGenerator:
         b = random.randint(0, p - 1)
         c = (a * b) % p
 
-        # Creating the shares of the secrets
-        sec = Secret() # TODO: Not especially needed here, it's just there because I changed the share_secret function definition. Could be dealt with better. 
-        a_shares = share_secret(a, len(self.participant_ids), sec)
-        b_shares = share_secret(b, len(self.participant_ids), sec)
-        c_shares = share_secret(c, len(self.participant_ids), sec)
+        # Creating the shares of the secrets 
+        a_shares = share_secret(a, len(self.participant_ids))
+        b_shares = share_secret(b, len(self.participant_ids))
+        c_shares = share_secret(c, len(self.participant_ids))
 
         # Populate the map with the shares of the triplet. Each client_id represents the share for that client. 
         self.triplet_map[op_id] = {}
