@@ -4,7 +4,7 @@ Secret sharing scheme.
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, Final
 
 # Added imports
 import random
@@ -16,36 +16,25 @@ class Share:
     A secret share in a finite field.
     """
                 
-    prime = 340282366920938463463374607431768211507  # some temporary value, representing prime p in the field (it's a 128 bit prime)
+    prime : Final[int] = 340282366920938463463374607431768211507  # some temporary value, representing prime p in the field (it's a 128 bit prime)
 
     # Adapt constructor arguments as you wish
-    def __init__(self, share_value: int):
+    def __init__(self, value: int):
 
-        self.share_value = share_value
+        self.value = value
 
     def __repr__(self):
         # Helps with debugging.
-        return f"{self.__class__.__name__}({repr(self.share_value)})"
+        return f"{self.__class__.__name__}({repr(self.value)})"
 
     def __add__(self, other):
-        
-        if isinstance(other, Share):
-            return Share((self.share_value + other.share_value) % self.prime)
-        
-        return Share((self.share_value + other) % self.prime)
+        return Share((self.value + other.value) % self.prime)
 
     def __sub__(self, other):
-
-        if isinstance(other, Share):
-            return Share((self.share_value - other.share_value) % self.prime)
-
-        return Share((self.share_value - other) % self.prime)
+        return Share((self.value - other.value) % self.prime)
 
     def __mul__(self, other):
-
-        if isinstance(other, int):
-            return Share((self.share_value * other) % self.prime)
-        return self
+        return Share((self.value * other.value) % self.prime)
 
     def serialize(self):
         """Generate a representation suitable for passing in a message."""
@@ -63,9 +52,9 @@ def share_secret(secret: int, num_shares: int) -> List[Share]:
     secret_shares = []
     sum = 0
     for i in range(0, num_shares-1):
-        random_share_value = random.randint(0, Share.prime - 1)
-        sum += random_share_value
-        secret_shares.append(Share(random_share_value))
+        random_value = random.randint(0, Share.prime - 1)
+        sum += random_value
+        secret_shares.append(Share(random_value))
 
     secret_shares.insert(0, Share((secret - sum) % Share.prime))
 
@@ -77,7 +66,7 @@ def reconstruct_secret(shares: List[Share]) -> int:
     
     secret = 0
     for share in shares:
-        secret = secret + share.share_value
+        secret = secret + share.value
 
     return secret % Share.prime 
 

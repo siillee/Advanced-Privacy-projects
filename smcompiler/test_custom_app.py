@@ -68,4 +68,24 @@ def suite(parties, expr, expected):
         assert result == expected
 
 def test_hospital_data():
-    return ""
+
+    # Data of 2 patients per hospital, for three hospitals. One secret represents weight, the other 1/height^2 for each patient. 
+    # In this case, the secrets represent: weight, 1/height^2, weight, 1/height^2.  
+    hospital_1_data = [Secret(), Secret(), Secret(), Secret()]
+    hospital_2_data = [Secret(), Secret(), Secret(), Secret()]
+    hospital_3_data = [Secret(), Secret(), Secret(), Secret()]
+
+    parties = {
+        "Hospital 1": {hospital_1_data[0]: 82, hospital_1_data[1]: 0.3, hospital_1_data[2]: 75, hospital_1_data[3]: 0.27},
+        "Hospital 2": {hospital_2_data[0]: 64, hospital_2_data[1]: 0.42, hospital_2_data[2]: 102, hospital_2_data[3]: 0.31}, 
+        "Hospital 3": {hospital_3_data[0]: 105, hospital_3_data[1]: 0.28, hospital_3_data[2]: 53, hospital_3_data[3]: 0.35},
+    }
+
+    expr = (
+         (hospital_1_data[0]*hospital_1_data[1]) + (hospital_1_data[2]*hospital_1_data[3]) + 
+         (hospital_2_data[0]*hospital_2_data[1]) + (hospital_2_data[2]*hospital_2_data[3]) +
+         (hospital_3_data[0]*hospital_3_data[1]) + (hospital_3_data[2]*hospital_3_data[3])    
+        ) * (Scalar(1/12) + Scalar(1/12)) # TODO: This is stupidly artificial (instead of just having Scalar(1/6)), but for now we have scalar addition here :D
+    
+    expected = (82*0.3 + 75*0.27 + 64*0.42 + 102*0.31 + 105*0.28 + 53*0.35) * (1/12 + 1/12)
+    suite(parties, expr, expected)
