@@ -16,7 +16,7 @@ class Share:
     A secret share in a finite field.
     """
                 
-    prime : Final[int] = 340282366920938463463374607431768211507  # some temporary value, representing prime p in the field (it's a 128 bit prime)
+    prime : Final[int] = 340282366920938463463374607431768211507  # Represents prime p in the field (it's a 128 bit prime). 
 
     # Adapt constructor arguments as you wish
     def __init__(self, value: int):

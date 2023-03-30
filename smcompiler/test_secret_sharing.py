@@ -5,7 +5,7 @@ Testing secret sharing is not obligatory.
 MODIFY THIS FILE.
 """
 
-from expression import Secret
+from expression import Secret, Scalar
 from secret_sharing import Share, share_secret, reconstruct_secret
 
 def test_addition():
@@ -47,7 +47,7 @@ def test_subtraction():
 def test_scalar_multiplication():
 
     a = Secret(7)
-    k = 3
+    k = Scalar(3)
 
     a_shares = share_secret(a.value, 2)
     assert len(a_shares) == 2

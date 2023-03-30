@@ -92,7 +92,7 @@ class SMCParty:
 
         if self.client_id == self.client_zero:
             data = ["", totalTime, compTime, total_bytes_sent, total_bytes_received]
-            with open('perform_proba.csv', 'a', encoding='UTF8') as f:
+            with open('performance_data.csv', 'a', encoding='UTF8') as f:
                 writer = csv.writer(f)
                 writer.writerow(data)
 

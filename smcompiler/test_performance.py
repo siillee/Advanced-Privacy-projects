@@ -133,7 +133,7 @@ def test_addition():
 def test_scalar_addition():
 
     for _ in range(num_of_repeats):
-        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
             data = ["scalar_add_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
@@ -159,7 +159,7 @@ def test_scalar_addition():
 def test_multiplication():
 
     for _ in range(num_of_repeats):
-        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
             data = ["mult_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
@@ -186,7 +186,7 @@ def test_multiplication():
 def test_scalar_multiplication():
 
     for _ in range(num_of_repeats):
-        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
+        with open('performance_data.csv', 'a', encoding='UTF8') as f:
             data = ["scalar_mult_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
