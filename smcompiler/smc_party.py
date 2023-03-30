@@ -63,8 +63,7 @@ class SMCParty:
         self.value_dict = value_dict
 
         self.secret_shares_received = {}
-        self.client_zero = sorted(self.protocol_spec.participant_ids)[
-            0] 
+        self.client_zero = sorted(self.protocol_spec.participant_ids)[0] 
 
     def run(self) -> int:
         """
@@ -85,17 +84,17 @@ class SMCParty:
         res_share: Share = self.process_expression(self.protocol_spec.expr)
 
         # Writing performance measurements to file
-        # endTime = time.time()
-        # totalTime = endTime - startTime
-        # compTime = totalTime -self.comm.network_delay
-        # total_bytes_sent = self.comm.bytes_sent
-        # total_bytes_received = self.comm.bytes_received
+        endTime = time.time()
+        totalTime = endTime - startTime
+        compTime = totalTime -self.comm.network_delay
+        total_bytes_sent = self.comm.bytes_sent
+        total_bytes_received = self.comm.bytes_received
 
-        # if self.client_id == self.client_zero:
-        #     data = ["", totalTime, compTime, total_bytes_sent, total_bytes_received]
-        #     with open('performance_data.csv', 'a', encoding='UTF8') as f:
-        #         writer = csv.writer(f)
-        #         writer.writerow(data)
+        if self.client_id == self.client_zero:
+            data = ["", totalTime, compTime, total_bytes_sent, total_bytes_received]
+            with open('perform_proba.csv', 'a', encoding='UTF8') as f:
+                writer = csv.writer(f)
+                writer.writerow(data)
 
         return self.reconstruction_of_secret("public_res", res_share)
 
@@ -103,7 +102,7 @@ class SMCParty:
     def process_expression(
             self,
             expr: Expression
-        ) -> Share:
+        ):
         if isinstance(expr, AddOp):
             a = self.process_expression(expr.a)
             b = self.process_expression(expr.b)
@@ -114,7 +113,7 @@ class SMCParty:
             if isinstance(a, Scalar) and isinstance(b, Scalar):
                 return Scalar(a.value + b.value)
             
-            # In case a or b is a Scalar, only one client adds the Scalar. TODO: This is checked kinda stupidly, idk if there is a smarter way for now. 
+            # In case a or b is a Scalar, only one client adds the Scalar. 
             if self.client_id != self.client_zero:
                 if isinstance(a, Scalar):
                     return b
@@ -153,8 +152,8 @@ class SMCParty:
                 x_a_share = a - beaver_triplet_shares[0]
                 y_b_share = b - beaver_triplet_shares[1]
 
-                x_a = self.reconstruction_of_secret("public_x_a_share", x_a_share)
-                y_b = self.reconstruction_of_secret("public_y_b_share", y_b_share)
+                x_a = self.reconstruction_of_secret("public_x_a_share" + str(expr.id), x_a_share)
+                y_b = self.reconstruction_of_secret("public_y_b_share" + str(expr.id), y_b_share)
 
                 z_share = beaver_triplet_shares[2] + (a*Scalar(y_b)) + (b*Scalar(x_a))
                 if self.client_id == self.client_zero:
@@ -166,11 +165,9 @@ class SMCParty:
              
 
         if isinstance(expr, Secret):
-            if expr.id in self.secret_shares_received:
-                return self.secret_shares_received[expr.id]
-            else:
+            if expr.id not in self.secret_shares_received:
                 self.secret_shares_received[expr.id] = Share.deserialize(self.comm.retrieve_private_message(expr.id))
-                return self.secret_shares_received[expr.id]
+            return self.secret_shares_received[expr.id]
 
         if isinstance(expr, Scalar):
             return expr

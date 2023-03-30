@@ -45,7 +45,6 @@ class Share:
         """Restore object from its serialized representation."""
         return jsonpickle.decode(serialized)
 
-# I changed the original def by adding the secObj: Secret parameter, I guess it is not a problem. 
 def share_secret(secret: int, num_shares: int) -> List[Share]:
     """Generate secret shares."""
 

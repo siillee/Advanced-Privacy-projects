@@ -71,15 +71,18 @@ def suite(parties, expr, expected):
     for result in results:
         assert result == expected
 
+
+num_of_repeats = 10
+
 def test_num_of_participants():
 
-    for _ in range(10):
+    for _ in range(num_of_repeats):
         with open('performance_data.csv', 'a', encoding='UTF8') as f:
             data = ["participants_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
 
-        num_of_participants = [10, 20, 50, 100] # The 200 case here take around 100 seconds to finish. 
+        num_of_participants = [10, 20, 50, 100]
         alice_secret = Secret()
         bob_secret = Secret()
         charlie_secret = Secret()
@@ -102,7 +105,7 @@ def test_num_of_participants():
 
 def test_addition():
 
-    for _ in range(10):
+    for _ in range(num_of_repeats):
         with open('performance_data.csv', 'a', encoding='UTF8') as f:
             data = ["add_test", "", "", "", ""]
             writer = csv.writer(f)
@@ -118,7 +121,6 @@ def test_addition():
             "Charlie": {charlie_secret: 2}
         }
 
-        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
         num_of_additions = [10, 100, 250, 500]
 
         for num in num_of_additions:
@@ -130,8 +132,8 @@ def test_addition():
 
 def test_scalar_addition():
 
-    for _ in range(10):
-        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+    for _ in range(num_of_repeats):
+        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
             data = ["scalar_add_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
@@ -146,7 +148,6 @@ def test_scalar_addition():
             "Charlie": {charlie_secret: 3}
         }
         
-        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
         num_of_additions = [10, 100, 250, 500]
         for num in num_of_additions:
             expr = (alice_secret + bob_secret + charlie_secret)
@@ -157,8 +158,8 @@ def test_scalar_addition():
 
 def test_multiplication():
 
-    for _ in range(10):
-        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+    for _ in range(num_of_repeats):
+        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
             data = ["mult_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
@@ -173,10 +174,9 @@ def test_multiplication():
             "Charlie": {charlie_secret: 2}
         }
 
-        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-        num_of_additions = [10, 100, 250, 500]
+        num_of_mults = [10, 100, 250, 500]
 
-        for num in num_of_additions:
+        for num in num_of_mults:
             expr = alice_secret
             for _ in range(num-1):
                 expr *= alice_secret
@@ -185,8 +185,8 @@ def test_multiplication():
 
 def test_scalar_multiplication():
 
-    for _ in range(10):
-        with open('performance_data.csv', 'a', encoding='UTF8') as f:
+    for _ in range(num_of_repeats):
+        with open('perform_proba.csv', 'a', encoding='UTF8') as f:
             data = ["scalar_mult_test", "", "", "", ""]
             writer = csv.writer(f)
             writer.writerow(data)
@@ -201,9 +201,8 @@ def test_scalar_multiplication():
             "Charlie": {charlie_secret: 3}
         }
         
-        # For the 1000 case, "RecursionError: maximum recursion depth exceeded while calling a Python object" happens
-        num_of_additions = [10, 100, 250, 500]
-        for num in num_of_additions:
+        num_of_mults = [10, 100, 250, 500]
+        for num in num_of_mults:
             expr = (alice_secret + bob_secret + charlie_secret)
             for _ in range(num):
                 expr *= Scalar(5)
