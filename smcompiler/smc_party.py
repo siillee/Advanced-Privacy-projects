@@ -98,7 +98,7 @@ class SMCParty:
 
         return self.reconstruction_of_secret("public_res", res_share)
 
-    # Suggestion: To process expressions, make use of the *visitor pattern* like so:
+    # Processing of the expression (traversing the abstract syntax tree). 
     def process_expression(
             self,
             expr: Expression
@@ -146,7 +146,7 @@ class SMCParty:
                 return Scalar(a.value * b.value)
 
             # Case where both are of type Share. Get the beaver triplet shares, and do the computation needed.
-            # Names of the variables are similar to how they named them in the docs on git. 
+            # Names of the variables are similar to the docs on git. 
             if isinstance(a, Share) and isinstance(b, Share):
                 beaver_triplet_shares = self.get_beaver_triplet(expr.id)
                 x_a_share = a - beaver_triplet_shares[0]
@@ -171,14 +171,10 @@ class SMCParty:
 
         if isinstance(expr, Scalar):
             return expr
-        #
-        # Call specialized methods for each expression type, and have these specialized
-        # methods in turn call `process_expression` on their sub-expressions to process
-        # further.
+
         pass
 
-    # Feel free to add as many methods as you want.    
-    
+
     def get_beaver_triplet(self, id: str):
         return self.comm.retrieve_beaver_triplet_shares(id)
     

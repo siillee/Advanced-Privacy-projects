@@ -8,10 +8,6 @@ MODIFY THIS FILE.
 from ttp import TrustedParamGenerator
 
 
-# def test():
-#     raise NotImplementedError("You can create some tests.")
-
-
 def test_beaver_triplet_gen():
 
     ttp = TrustedParamGenerator()

@@ -15,8 +15,9 @@ class Share:
     """
     A secret share in a finite field.
     """
-                
-    prime : Final[int] = 340282366920938463463374607431768211507  # Represents prime p in the field (it's a 128 bit prime). 
+    
+    # Represents prime p in the field.
+    prime : Final[int] = 340282366920938463463374607431768211507
 
     # Adapt constructor arguments as you wish
     def __init__(self, value: int):
@@ -69,4 +70,3 @@ def reconstruct_secret(shares: List[Share]) -> int:
 
     return secret % Share.prime 
 
-# Feel free to add as many methods as you want.

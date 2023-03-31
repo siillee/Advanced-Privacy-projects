@@ -74,6 +74,7 @@ def suite(parties, expr, expected):
 
 num_of_repeats = 10
 
+# Tests the performance based on the number of participants. 
 def test_num_of_participants():
 
     for _ in range(num_of_repeats):
@@ -103,6 +104,7 @@ def test_num_of_participants():
 
             suite(parties, expr, expected)
 
+# Tests the performance based on the number of addition operations. 
 def test_addition():
 
     for _ in range(num_of_repeats):
@@ -130,6 +132,7 @@ def test_addition():
             expected = num * 3
             suite(parties, expr, expected)
 
+# Tests the performance based on the number of scalar addition operations. 
 def test_scalar_addition():
 
     for _ in range(num_of_repeats):
@@ -156,6 +159,7 @@ def test_scalar_addition():
             expected = 20 + num*5
             suite(parties, expr, expected)
 
+# Tests the performance based on the number of multiplication operations. 
 def test_multiplication():
 
     for _ in range(num_of_repeats):
@@ -183,6 +187,7 @@ def test_multiplication():
             expected = (pow(3, num)) % Share.prime
             suite(parties, expr, expected)
 
+# Tests the performance based on the number of scalar multiplication operations. 
 def test_scalar_multiplication():
 
     for _ in range(num_of_repeats):

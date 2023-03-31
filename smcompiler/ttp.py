@@ -17,8 +17,6 @@ from secret_sharing import(
     Share,
 )
 
-# Feel free to add as many imports as you want.
-
 import random
 from expression import Secret
 
@@ -48,8 +46,6 @@ class TrustedParamGenerator:
         
         return self.triplet_map[op_id][client_id]
 
-
-    # Feel free to add as many methods as you want.
 
     def generate_triplet(self, op_id: str):
 
