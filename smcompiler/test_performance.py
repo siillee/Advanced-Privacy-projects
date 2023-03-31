@@ -82,7 +82,7 @@ def test_num_of_participants():
             writer = csv.writer(f)
             writer.writerow(data)
 
-        num_of_participants = [10, 20, 50, 100]
+        num_of_participants = [10, 20, 50, 100, 200]
         alice_secret = Secret()
         bob_secret = Secret()
         charlie_secret = Secret()

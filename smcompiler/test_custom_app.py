@@ -68,6 +68,10 @@ def suite(parties, expr, expected):
         print("Average BMI is : " + str(result/600))
         assert result == expected
 
+# This test demonstrates a simple example of how hospitals can compute statistics in a privacy perserving manner. 
+# The example consists of calculating the average BMI of patients in the hospitals. The expression evaluates the sum of the products of weight
+# and height, and the average is calculated outside the expression, in the suite(...) function. This is because we do not have division
+# implemented in this project. The reason for having the multiplications by 10 is to work with integers. 
 def test_hospital_data():
 
     # Data of 2 patients per hospital, for three hospitals. One secret represents weight, the other 10/height^2 for each patient. 
