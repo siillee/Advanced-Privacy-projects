@@ -81,15 +81,15 @@ def test_hospital_data():
     hospital_3_data = [Secret(), Secret(), Secret(), Secret()]
 
     parties = {
-        "Hospital 1": {hospital_1_data[0]: 82, hospital_1_data[1]: 3, hospital_1_data[2]: 75, hospital_1_data[3]: 2},
-        "Hospital 2": {hospital_2_data[0]: 64, hospital_2_data[1]: 4, hospital_2_data[2]: 102, hospital_2_data[3]: 3}, 
-        "Hospital 3": {hospital_3_data[0]: 105, hospital_3_data[1]: 2, hospital_3_data[2]: 53, hospital_3_data[3]: 3},
+        "Hospital 1": {hospital_1_data[0]: 80, hospital_1_data[1]: 3, hospital_1_data[2]: 75, hospital_1_data[3]: 2},
+        "Hospital 2": {hospital_2_data[0]: 60, hospital_2_data[1]: 4, hospital_2_data[2]: 102, hospital_2_data[3]: 3}, 
+        "Hospital 3": {hospital_3_data[0]: 100, hospital_3_data[1]: 2, hospital_3_data[2]: 53, hospital_3_data[3]: 3},
     }
 
     expr = (
-         (hospital_1_data[0]*hospital_1_data[1]*(Scalar(5) + Scalar(5))) + (hospital_1_data[2]*hospital_1_data[3]*(Scalar(5) + Scalar(5))) + 
-         (hospital_2_data[0]*hospital_2_data[1]*(Scalar(5) + Scalar(5))) + (hospital_2_data[2]*hospital_2_data[3]*(Scalar(5) + Scalar(5))) +
-         (hospital_3_data[0]*hospital_3_data[1]*(Scalar(5) + Scalar(5))) + (hospital_3_data[2]*hospital_3_data[3]*(Scalar(5) + Scalar(5)))    
+         ((hospital_1_data[0] + Scalar(2))*hospital_1_data[1]*(Scalar(5) + Scalar(5))) + (hospital_1_data[2]*hospital_1_data[3]*(Scalar(5) + Scalar(5))) + 
+         ((hospital_2_data[0] + Scalar(4))*hospital_2_data[1]*(Scalar(5) + Scalar(5))) + (hospital_2_data[2]*hospital_2_data[3]*(Scalar(5) + Scalar(5))) +
+         ((hospital_3_data[0] + Scalar(5)) *hospital_3_data[1]*(Scalar(5) + Scalar(5))) + (hospital_3_data[2]*hospital_3_data[3]*(Scalar(5) + Scalar(5)))    
         )
     
     expected = (820*3 + 750*2 + 640*4 + 1020*3 + 1050*2 + 530*3) 
